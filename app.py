@@ -47,4 +47,4 @@ Post:
         st.text_area("📄 Output", output, height=400)
 
 st.markdown("---")
-st.markdown("Built using free Hugging Face models — no OpenAI key needed 🚀
+st.markdown("Built using free Hugging Face models — no OpenAI key needed 🚀")
