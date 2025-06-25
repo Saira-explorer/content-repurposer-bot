@@ -1,26 +1,27 @@
 import streamlit as st
-import openai
+from openai import OpenAI
 
-# Set your OpenAI API key
-# openai.api_key = st.secrets.get("OPENAI_API_KEY", "sk-...")  # Replace with your key or use Streamlit Secrets
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+# Set your OpenAI API key from Streamlit secrets
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-st.set_page_config(page_title="Content Repurposer", layout="centered")
-
+# Streamlit app setup
+st.set_page_config(page_title="Content Repurposer Bot", layout="centered")
 st.title("🪄 Content Repurposer Bot")
-st.write("Turn a blog or LinkedIn post into social media gold 🧵📩📸")
+st.write("Paste a blog or LinkedIn post, and get it repurposed for Twitter, Instagram, and more!")
 
-# Input area
-post_input = st.text_area("Paste your blog or LinkedIn post:", height=300)
-tone = st.selectbox("Choose a tone:", ["Professional", "Witty", "Inspiring"])
+# User input
+post_input = st.text_area("✍️ Paste your blog or LinkedIn post here:", height=300)
+tone = st.selectbox("🎙️ Choose the tone you want:", ["Professional", "Witty", "Inspiring"])
 
-if st.button("Repurpose Content") and post_input:
-    with st.spinner("🧠 Thinking..."):
+# When user clicks the button
+if st.button("🔁 Repurpose Content") and post_input:
+    with st.spinner("Generating repurposed content..."):
 
+        # Prompt template
         prompt = f"""
 You are a social media content strategist.
 
-Take the following post and rewrite it into 4 formats:
+Take the following long-form post and rewrite it into 4 formats:
 1. A tweet thread (max 5 tweets)
 2. An Instagram caption with emojis and hashtags
 3. A short email teaser for a newsletter
@@ -32,18 +33,20 @@ Post:
         """
 
         try:
-            response = openai.ChatCompletion.create(
+            # OpenAI call using new SDK
+            response = client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.7,
                 max_tokens=800
             )
 
-            output = response['choices'][0]['message']['content']
-            st.success("Here’s your repurposed content 👇")
-            st.text_area("Repurposed Outputs", output, height=400)
+            output = response.choices[0].message.content
+            st.success("✅ Your repurposed content is ready!")
+            st.text_area("📄 Output", output, height=400)
         except Exception as e:
-            st.error(f"Something went wrong: {e}")
+            st.error(f"⚠️ Error: {e}")
 
+# Footer
 st.markdown("---")
-st.markdown("Made with ❤️ by a solo founder exploring AI")
+st.markdown("Built by a solo founder exploring AI entrepreneurship 🚀")
