@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 
 # Hugging Face model endpoint (use Mistral for quality + speed)
-API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
+API_URL = "https://api-inference.huggingface.co/models/HuggingFaceH4/zephyr-7b-beta"
 HF_TOKEN = st.secrets["HF_TOKEN"]  # Store in Streamlit Secrets (for free use)
 
 headers = {"Authorization": f"Bearer {HF_TOKEN}"}
