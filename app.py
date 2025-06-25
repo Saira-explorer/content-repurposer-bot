@@ -1,23 +1,29 @@
 import streamlit as st
-from openai import OpenAI
+import requests
 
-# Set your OpenAI API key from Streamlit secrets
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+# Hugging Face model endpoint (use Mistral for quality + speed)
+API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.1"
+HF_TOKEN = st.secrets["HF_TOKEN"]  # Store in Streamlit Secrets (for free use)
 
-# Streamlit app setup
+headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+
 st.set_page_config(page_title="Content Repurposer Bot", layout="centered")
-st.title("🪄 Content Repurposer Bot")
-st.write("Paste a blog or LinkedIn post, and get it repurposed for Twitter, Instagram, and more!")
+st.title("🪄 Content Repurposer Bot (Free Hugging Face Version)")
+st.write("Turn a blog or LinkedIn post into tweets, captions, emails, and hooks!")
 
-# User input
-post_input = st.text_area("✍️ Paste your blog or LinkedIn post here:", height=300)
-tone = st.selectbox("🎙️ Choose the tone you want:", ["Professional", "Witty", "Inspiring"])
+post_input = st.text_area("✍️ Paste your blog or LinkedIn post:", height=300)
+tone = st.selectbox("🎙️ Choose the tone:", ["Professional", "Witty", "Inspiring"])
 
-# When user clicks the button
+def query(payload):
+    response = requests.post(API_URL, headers=headers, json=payload)
+    if response.status_code == 200:
+        return response.json()[0]["generated_text"]
+    else:
+        return f"⚠️ Error {response.status_code}: {response.text}"
+
 if st.button("🔁 Repurpose Content") and post_input:
-    with st.spinner("Generating repurposed content..."):
+    with st.spinner("Generating using free model..."):
 
-        # Prompt template
         prompt = f"""
 You are a social media content strategist.
 
@@ -32,21 +38,13 @@ Post:
 {post_input}
         """
 
-        try:
-            # OpenAI call using new SDK
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.7,
-                max_tokens=800
-            )
+        output = query({
+            "inputs": prompt,
+            "parameters": {"max_new_tokens": 400, "temperature": 0.7}
+        })
 
-            output = response.choices[0].message.content
-            st.success("✅ Your repurposed content is ready!")
-            st.text_area("📄 Output", output, height=400)
-        except Exception as e:
-            st.error(f"⚠️ Error: {e}")
+        st.success("✅ Repurposed content is ready!")
+        st.text_area("📄 Output", output, height=400)
 
-# Footer
 st.markdown("---")
-st.markdown("Built by a solo founder exploring AI entrepreneurship 🚀")
+st.markdown("Built using free Hugging Face models — no OpenAI key needed 🚀
