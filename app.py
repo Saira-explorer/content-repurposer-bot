@@ -2,7 +2,8 @@ import streamlit as st
 import openai
 
 # Set your OpenAI API key
-openai.api_key = st.secrets.get("OPENAI_API_KEY", "sk-...")  # Replace with your key or use Streamlit Secrets
+# openai.api_key = st.secrets.get("OPENAI_API_KEY", "sk-...")  # Replace with your key or use Streamlit Secrets
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 st.set_page_config(page_title="Content Repurposer", layout="centered")
 
